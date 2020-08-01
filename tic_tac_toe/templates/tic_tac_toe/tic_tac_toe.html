@@ -51,6 +51,10 @@
             </tr>
         </table>
 
+        <br><br>
+
+        <textarea id="from_server" cols="2" rows = "10"></textarea>
+
         <script>
             const board = document.getElementById('tic_tac_toe_board')
             
@@ -59,11 +63,32 @@
                 setDefaultBoard(board);
             }
 
+            const gameSocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/'
+            )
+
+            gameSocket.onmessage = function(e) {
+                // Executes when a message is received from the server
+                const game_data = JSON.parse(e.data)
+                document.getElementById('from_server').textContent = game_data.player;
+            }
+
+            gameSocket.onclose = function(e) {
+                // Executes when the connection closes
+                console.error('Chat socket closed unexpectedly');
+            };
+
             // On cell click
             for (let i = 0; i < board.rows.length; i++){
                 for (let j = 0; j < board.rows[i].cells.length; j++){
                     board.rows[i].cells[j].onclick = function () {
                         cellClicked(this);
+                        gameSocket.send(JSON.stringify({
+                            'player': 'clicked' + i + j,
+                            'cur_board': [['X', 'O', 'X'], ['', '', ''], ['', '', '']]
+                        }))
                     };
                 }
             }

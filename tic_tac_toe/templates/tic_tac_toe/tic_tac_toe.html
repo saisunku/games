@@ -27,7 +27,7 @@
         </select>
         <select name="Player O" id="player_O_dropdown">
             <option value="human">Human</option>
-            <option value="random_ai">Random AI</option>
+            <option value="random">Random AI</option>
             <option value="minimax">Minimax</option>
         </select>
 
@@ -53,26 +53,41 @@
 
         <br><br>
 
-        <textarea id="from_server" cols="2" rows = "10"></textarea>
+        <textarea id="from_server" cols="20" rows = "10"></textarea>
+        <button id="reset_button">Reset</button>
 
         <script>
-            const board = document.getElementById('tic_tac_toe_board')
-            
-            // On page load
-            window.onload = function () {
-                setDefaultBoard(board);
-            }
+            let cur_player = 'X';
+            let game_over = false;
+            let winner = null;
+            let next_move = [];
 
+            const board = document.getElementById('tic_tac_toe_board');
+            setDefaultBoard();
+            
+            // Reset button
+            document.getElementById('reset_button').onclick = function () {
+                setDefaultBoard();
+            }
+            
+            // Connect to server via WebSocket
             const gameSocket = new WebSocket(
                 'ws://'
                 + window.location.host
-                + '/ws/'
+                + '/ws/tic_tac_toe/'
             )
 
             gameSocket.onmessage = function(e) {
                 // Executes when a message is received from the server
-                const game_data = JSON.parse(e.data)
-                document.getElementById('from_server').textContent = game_data.player;
+                const game_data = JSON.parse(e.data);
+                game_over = game_data.game_over;
+                winner = game_data.winner;
+                next_move = game_data.next_move;
+
+                document.getElementById('from_server').textContent += next_move + '\n';
+
+                board.rows[next_move[0]].cells[next_move[1]].textContent = cur_player;
+                updatePlayer();
             }
 
             gameSocket.onclose = function(e) {
@@ -80,32 +95,119 @@
                 console.error('Chat socket closed unexpectedly');
             };
 
-            // On cell click
-            for (let i = 0; i < board.rows.length; i++){
-                for (let j = 0; j < board.rows[i].cells.length; j++){
-                    board.rows[i].cells[j].onclick = function () {
-                        cellClicked(this);
-                        gameSocket.send(JSON.stringify({
-                            'player': 'clicked' + i + j,
-                            'cur_board': [['X', 'O', 'X'], ['', '', ''], ['', '', '']]
-                        }))
-                    };
-                }
+            function humanPlayer(boardCell) {
+                console.log('cell clicked' + boardCell)
+                boardCell.textContent = cur_player;
             }
 
-            function cellClicked(boardCell) {
-                console.log('cell clicked' + boardCell)
-                alert(boardCell.textContent);
-                boardCell.textContent = 'C';
+            function updatePlayer () {
+                if (cur_player === 'X') {
+                    cur_player = 'O'
+                } else {
+                    cur_player = 'X'
+                };
             }
             
-            function setDefaultBoard(board) {
+            function setDefaultBoard() {
                 for (let i = 0; i < board.rows.length; i++){
                     for (let j = 0; j < board.rows[i].cells.length; j++){
                         board.rows[i].cells[j].textContent = String.fromCharCode(160); // charCode 160 is a non-breaking space
                     }
                 }
             }
+
+            function boardToArray(board) {
+                // Converts the board which is a HTML table to a JavaScript array
+                let boardArray = [];
+                for (let i = 0; i < board.rows.length; i++){
+                    let row = [];
+                   for (let j = 0; j < board.rows[i].cells.length; j++){
+                       row.push(board.rows[i].cells[j].textContent)
+                    }
+                    boardArray.push(row);
+                }
+                return boardArray
+            }
+
+            function getNextMove(ai, cur_board) {
+                gameSocket.send(JSON.stringify({
+                    'cur_player': cur_player,
+                    'ai': ai,
+                    'cur_board': boardToArray(board),
+                }))
+            }
+
+            function getWinner(board) {
+                function returnWinner(charArray) {
+                    let unique = [...new Set(charArray)]
+                    return (unique.length === 1 && unique[0] != String.fromCharCode(160) ? charArray[0] : null);
+                };
+
+                boardArray = boardToArray(board);
+                let possibleWinners = [];
+
+                // Check horizontally
+                for (let i = 0; i < boardArray.length; i++) {
+                    possibleWinners.push(boardArray[i]);
+               }
+
+                // Check vertically
+                for (let i = 0; i < boardArray.length; i++) {
+                    let column = []
+                    for (let k = 0; k < boardArray.length; k++) {
+                        column.push(boardArray[k][i])
+                    }
+                    possibleWinners.push(column)
+               }
+
+                // Check main diagonal
+                let diag = [];
+                for (let i = 0; i < boardArray.length; i++) {
+                    diag.push(boardArray[i][i]);
+                }
+                possibleWinners.push(diag)
+
+                // Check other diagonal
+                diag = [];
+                for (let i = 0; i < boardArray.length; i++) {
+                    diag.push(boardArray[i][boardArray.length - i - 1]);
+                }
+                possibleWinners.push(diag)
+
+                console.log(possibleWinners)
+
+                for (let possibleWinner of possibleWinners) {
+                    const winner = returnWinner(possibleWinner);
+                    if (winner) { return winner; }
+                }
+
+                return null;
+            }
+
+            // Executes on cell click
+            for (let i = 0; i < board.rows.length; i++){
+                for (let j = 0; j < board.rows[i].cells.length; j++){
+                    board.rows[i].cells[j].onclick = function () {
+                        board.rows[i].cells[j].textContent = cur_player;
+
+                        const winner = getWinner(board);
+                        if (winner) {
+                            console.log(winner)
+                            document.getElementById('from_server').textContent += cur_player + ' won!\n';
+                            setDefaultBoard();
+                        }
+
+                        updatePlayer();
+
+                        const ai = document.getElementById('player_O_dropdown').value;
+                        if (ai != 'human') {
+                            // Get next move from server
+                            getNextMove(ai, board);
+                        }
+                    };
+                }
+            }
+
         </script>
     </body>
 </html>

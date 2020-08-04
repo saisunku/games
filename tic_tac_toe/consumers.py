@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import JsonWebsocketConsumer
-import random
+
+from tic_tac_toe.ttt_game.ttt_game import tic_tac_toe
 
 class tic_tac_toe_consumer(JsonWebsocketConsumer):
     def connect(self):
@@ -8,29 +9,6 @@ class tic_tac_toe_consumer(JsonWebsocketConsumer):
 
     def disconnect(self, close_code):
         pass
-
-    @staticmethod
-    def random_ai(cur_board):
-        flattened_board = [char for row in cur_board for char in row]
-        avail_sqr = []	# List that contains the indices of available squares
-        for idx, sqr in enumerate(flattened_board):
-            if sqr == chr(160):
-                avail_sqr.append(idx)
-
-        print(flattened_board)
-        print(avail_sqr)
-
-        rand_idx = random.randrange(len(avail_sqr))
-        rand_sqr = avail_sqr[rand_idx]	# Index of the chosen square
-
-        print(rand_sqr)
-
-        # Convert to x, y coordinates
-        x = rand_sqr // len(cur_board)
-        y = rand_sqr % len(cur_board)
-
-        return [x, y]
-
 
     def receive_json(self, content):
         cur_player = content['cur_player']
@@ -40,7 +18,16 @@ class tic_tac_toe_consumer(JsonWebsocketConsumer):
         # print(cur_player, ai)
         # print(cur_board)
 
-        next_move = self.random_ai(cur_board)
+        T = tic_tac_toe(3, ai_player = cur_player, blank_char = chr(160))
+        T.board = cur_board
+
+        if ai == 'minimax':
+            next_move = T.minimax(cur_player)
+        else:
+            next_move = T.random_ai(cur_player)
+
+        # Array indexing in the Python module and in JS are opposite of each other
+        next_move.reverse()
         
         # print(next_move)
  

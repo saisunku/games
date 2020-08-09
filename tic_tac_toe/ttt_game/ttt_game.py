@@ -2,8 +2,7 @@
 # Program that is unbeatable at tic-tac-toe using the minimax algorithm
 #
 
-import random
-import copy
+import random, copy, pdb
 
 class tic_tac_toe():
 	"""Tic-tac-toe board class"""
@@ -289,7 +288,7 @@ class tic_tac_toe():
 
 
 	def get_minimax_score(self, board, player):
-		"""Returns the minimax score and the best move for a given board position and player"""
+		"""Returns a tuple of scores and moves for a given board position and player using the Minimax algorithm"""
 		
 		# If there is a winner return the score
 		winner = self.get_winner(board)
@@ -310,13 +309,7 @@ class tic_tac_toe():
 		scores = []
 		for move in moves:
 			new_board = self.make_move_minimax(board, player, move[0], move[1])
-
-			opponent = ''
-			if player == 'X':
-				opponent = 'O'
-			else:
-				opponent = 'X'
-			
+		
 			# Check if board or its symmetry equivalent boards is in cache
 			sym_list = self.get_sym_equiv(new_board)
 
@@ -328,16 +321,21 @@ class tic_tac_toe():
 
 			# If not, calculate the score and add new board and its symmetry-equivalents to cache
 			else:
+				if player == 'X':
+					opponent = 'O'
+				else:
+					opponent = 'X'
+
+				# First get scores for the next level
 				score = self.get_minimax_score(new_board, opponent)[0]
+
 				scores.append(score)
 				for sym_board in sym_list:
-					self.minimax_cache[self.board_to_tuple(sym_board)] = scores[-1]
+					self.minimax_cache[self.board_to_tuple(sym_board)] = score
 
-			# If the maximizing player gets a win or the minimizing player gets a win,
-			# we can stop evaluating the rest of the moves
 			if player == self.ai_player and score == 10:
 				break
-			if opponent == self.ai_player and score == -10:
+			if player != self.ai_player and score == -10:
 				break
 
 		if player == self.ai_player:
@@ -352,3 +350,43 @@ class tic_tac_toe():
 		_, best_move = self.get_minimax_score(self.board, player)
 
 		return best_move
+
+
+	def get_minimax_tree(self, board, player, depth):
+		"""Returns a tuple of scores and moves for a given board position and player using the Minimax algorithm"""
+
+		if not board:
+			board = self.board
+
+		# If there is a winner return the score
+		winner = self.get_winner(board)
+		if winner:
+			if winner == self.ai_player: 
+				return board, 10, []
+			else:
+				return board, -10, []
+
+		# If board is full and there is no winner, it's a draw
+		if self.is_full(board):
+			return board, 0, []
+
+		# Otherwise, get the score for the current board
+		score = self.get_minimax_score(board, player)[0]
+
+		# Get scores for all the moves
+		children = []
+
+		if depth > 0:
+			if player == 'X':
+				opponent = 'O'
+			else:
+				opponent = 'X'
+
+			moves = [[x, y] for x in range(self.board_sz) for y in range(self.board_sz) if board[y][x] == self.blank_char]
+
+			for move in moves:
+				new_board = self.make_move_minimax(board, player, move[0], move[1])
+				output = self.get_minimax_tree(new_board, opponent, depth - 1)
+				children.append(output)
+
+		return board, score, children

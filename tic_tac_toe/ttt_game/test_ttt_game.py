@@ -85,5 +85,9 @@ def test_minimax_1():
     assert B.minimax('X') == [2, 2]
 
 def test_minimax_2():
+    B.board = [['O', blank_char, 'X'], [blank_char, 'O', 'X'], [blank_char, blank_char, blank_char]]
+    assert B.minimax('O') == [2, 2]
+
+def test_minimax_3():
     B.board = [['O', 'O', blank_char], [blank_char, 'X', blank_char], [blank_char, blank_char, blank_char]]
     assert B.minimax('X') == [2, 0]

@@ -14,6 +14,8 @@
             <a href="https://github.com/saisunku/">GitHub</a> |
             <a href="https://www.linkedin.com/in/saisunku/">LinkedIn</a> |
             <a href=blog.html>Blog</a>
+            <br><br>
+            <h1>Tic Tac Toe Minimax Visualizer</h1>
         </div>
 
         <div class="page_side" id="left_side" style="float: left;">
@@ -29,10 +31,13 @@
         <select name="Player O" id="player_O_dropdown">
             <option value="minimax">Minimax</option>
             <option value="human">Human</option>
-            <option value="random">Random AI</option>
+            <option value="random">Random</option>
         </select>
         </div>
-
+        <div id="game_status_display" style="text-align: left; float: inherit;">
+            <br><br>
+            <h2>Start playing by clicking on one of the squares below</h2>
+        </div>
 
         <table class="board" id="main_board">
             <tr>
@@ -51,14 +56,33 @@
                 <td> </td>
             </tr>
         </table>
+        <div id="reset_button_div" style="text-align: center;">
+        <br>
+        <button id="reset_button" style="font-size: x-large;">Reset</button>
+        </div>
+        <!-- <br><br>
+        <textarea id="from_server" cols="40" rows = "10"></textarea> -->
         </div>
 
         <div class="page_side" id="right_side" style="float: right;">
-        <div class="tree" style="z-index: 0;">
-            <svg id="tree_svg" width="100%" height="500px"></svg>
+
+
+        <div class="tree" style="text-align: center;">
+            <h2 style="display: inline;">Minimax tree</h2><h3 style="display: inline;">   (scroll to zoom)</h3>
+            <svg id="tree_svg" width="100%" height="42%"></svg>
         </div>
 
-        <div style="z-index: 1; position: absolute; top: 400px; left: 1000px;">
+        <div style="float: left;">
+            <h2 style="display: inline; padding: 10px;">Tree Depth</h2>
+            <select name="Tree Depth" id="tree_depth_dropdown">
+                <option value=1>1</option>
+                <option value=2 selected="selected">2</option>
+                <option value=3>3</option>
+                <option value=4>4</option>
+            </select>
+        </div>
+
+        <div style="float: right; width: 20%;">
         <table class="board" id="side_board">
             <tr>
                 <td> </td>
@@ -79,12 +103,18 @@
         </div>
         </div>
 
-
-        <textarea id="from_server" cols="20" rows = "10"></textarea>
-        <button id="reset_button">Reset</button>
+        
+        
+        <div class="footer">
+            <br><br>
+            <h2>Technologies used</h2>
+            <b>Backend:</b> Python, Django, WebSockets, pytest  <br>
+            <b>Frontend:</b> HTML/CSS, JavaScript, d3.js
+        </div>
 
         <script>
             let cur_player = 'X';
+
             const nbsp = String.fromCharCode(160); // charCode 160 is a non-breaking space
 
             const main_board = document.getElementById('main_board');
@@ -92,6 +122,7 @@
             setDefaultBoard(main_board);
             setDefaultBoard(side_board);
             const svg = d3.select("#tree_svg");
+            // drawTree(null, svg);
 
             // Connect to server via WebSocket
             const gameSocket = new WebSocket(
@@ -105,7 +136,25 @@
                     'cur_player': cur_player,
                     'ai': ai,
                     'cur_board': boardToArray(main_board),
+                    'tree_depth': document.getElementById('tree_depth_dropdown').value,
                 }))
+            }
+
+            function checkDrawOrWinner(board) {
+                const winner = getWinner(board);
+                const draw = isFull(board);
+
+                if (winner) {
+                    // document.getElementById('from_server').textContent += cur_player + ' won!\n';
+                    document.getElementById('game_status_display').innerHTML = "<h2>" + winner + " won! Press the reset button to play again.</h2>"
+                    return true;
+                }
+                else if (draw) {
+                    // document.getElementById('from_server').textContent += 'Draw!\n';
+                    document.getElementById('game_status_display').innerHTML = "<h2> Draw! Press the reset button to play again.</h2>"
+                    return true;
+                }
+                return false;
             }
 
             gameSocket.onmessage = function(e) {
@@ -114,22 +163,16 @@
                 next_move = game_data.next_move;
                 treeData = game_data.tree;
 
-                document.getElementById('from_server').textContent += next_move + '\n';
+                // document.getElementById('from_server').textContent += next_move + '\n';
                 drawTree(treeData, svg);
 
-                main_board.rows[next_move[0]].cells[next_move[1]].textContent = cur_player;
-                const winner = getWinner(main_board);
-                const draw = isFull(main_board);
-                if (winner) {
-                    document.getElementById('from_server').textContent += cur_player + ' won!\n';
-                    // setDefaultBoard(main_board);
-                }
-                else if (draw) {
-                    document.getElementById('from_server').textContent += 'Draw!\n';
-                    // setDefaultBoard(main_board);
-                }
-                else {
-                    updatePlayer();
+                const ai = document.getElementById('player_O_dropdown').value;
+                if (ai == 'random' || ai == 'minimax') {
+                    main_board.rows[next_move[0]].cells[next_move[1]].textContent = cur_player;
+                
+                    if (!checkDrawOrWinner(main_board)) {
+                        updatePlayer();
+                    }
                 }
             }
 
@@ -141,27 +184,14 @@
             // Executes on cell click
             for (let i = 0; i < main_board.rows.length; i++){
                 for (let j = 0; j < main_board.rows[i].cells.length; j++){
-
                     main_board.rows[i].cells[j].onclick = function () {
-                        const winner = getWinner(main_board);
-                        const draw = isFull(main_board);
-
-                        if (winner) {
-                            document.getElementById('from_server').textContent += cur_player + ' won!\n';
-                            // setDefaultBoard(main_board);
-                        }
-                        else if (draw) {
-                            document.getElementById('from_server').textContent += 'Draw!\n';
-                            // setDefaultBoard(main_board);
-                        }
-                        else if (main_board.rows[i].cells[j].textContent == nbsp) {
+                        if (main_board.rows[i].cells[j].textContent == nbsp) {
                             main_board.rows[i].cells[j].textContent = cur_player;
 
-                            updatePlayer();
+                            if (!checkDrawOrWinner(main_board)) {
+                                updatePlayer();
 
-                            const ai = document.getElementById('player_O_dropdown').value;
-                            if (ai == 'random' || ai == 'minimax') {
-                                // Get next move from server
+                                const ai = document.getElementById('player_O_dropdown').value;
                                 getAIMove(ai, main_board);
                             }
                         }
@@ -174,6 +204,8 @@
                 setDefaultBoard(main_board);
                 setDefaultBoard(side_board);
                 drawTree(null, svg);
+                document.getElementById('game_status_display').innerHTML = "<h2>Start playing by clicking on one of the squares below</h2>";
+                cur_player = 'X';
             }
 
        </script>

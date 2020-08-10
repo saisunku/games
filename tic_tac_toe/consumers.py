@@ -14,31 +14,42 @@ class tic_tac_toe_consumer(JsonWebsocketConsumer):
         cur_player = content['cur_player']
         ai = content['ai']
         cur_board = content['cur_board']
-        depth = 2
+        depth = int(content['tree_depth'])
 
         # print(cur_player, ai)
         # print(cur_board)
 
-        T = tic_tac_toe(3, ai_player = cur_player, blank_char = chr(160))
-        T.board = cur_board
+        
+        if cur_player == 'X':
+            opponent = 'O'
+        else:
+            opponent = 'X'
 
-        if ai == 'minimax':
-            next_move = T.minimax(cur_player)
+        if ai == 'minimax' or ai == 'random':
+            T = tic_tac_toe(3, ai_player = cur_player, blank_char = chr(160))
+            T.board = cur_board
+
+            # Calculate AI move, update the board and then calculate the tree
+            if ai == 'minimax':
+                next_move = T.minimax(cur_player)
+            elif ai == 'random':
+                next_move = T.random_ai(cur_player)
+
             if next_move:
                 T.make_move(cur_player, next_move[0], next_move[1])
 
-                if cur_player == 'X':
-                    opponent = 'O'
-                else:
-                    opponent = 'X'
-
+                
                 tree = T.get_minimax_tree(T.board, opponent, depth)
             else:
-                tree = None
+                tree = T.get_minimax_tree(T.board, cur_player, depth)
 
         else:
-            next_move = T.random_ai(cur_player)
-            tree = None
+            # Human move, so just calculate tree
+            T = tic_tac_toe(3, ai_player = opponent, blank_char = chr(160))
+            T.board = cur_board
+
+            next_move = None
+            tree = T.get_minimax_tree(T.board, cur_player, depth)
 
         # Array indexing in the Python module and in JS are opposite of each other
         if next_move:

@@ -4,41 +4,55 @@ const margin = {
         right: 90,
         bottom: 30,
         left: 50
-    },
-    width = 400 - margin.left - margin.right,
-    height = 800 - margin.top - margin.bottom;
+    };
 
- svg.attr("fill", "beige")
-    .attr("stroke", "red")
+height = 400 - margin.left - margin.right;
+width = 2000 - margin.top - margin.bottom;
+
+svg.attr("fill", "red")
+    // .attr("stroke", "red")
+    .attr("viewBox", [0, 0, width, height])
     .call(d3.zoom()
-        .extent([[0, 0], [width, height]])
-        .scaleExtent([1, 8])
+        // .extent([[0, 0], [width, height]])
+        .scaleExtent([0.1, 10])
         .on("zoom", function () {
-        svg.attr("transform", d3.event.transform)
+        g.attr("transform", d3.event.transform)
      }));
+
 
 //Function that draws the tree
 function drawTree(treeData, svg) {
+    
     // Get the side board element
-    const side_board = document.getElementById("side_board")
+    const side_board = document.getElementById("side_board");
 
     // Remove the old group element in the SVG and add a new one
     svg.selectAll("*").remove();
     g = svg.append("g")
-        .attr("transform",
-            "translate(" + margin.top + "," + margin.left + ")");
+        // .attr("transform",
+        //     "translate(" + 0 + "," + 0 + ")");
+        // .attr("style",
+        //     "translate(0%, 50%)");
+        // .attr("transform","translate(30,100)scale(3,3)");
 
     // If treeData is not null, draw the tree
     if (treeData) {
+
+
         // declares a tree layout and assigns the size
-        const treemap = d3.tree().size([height, width]);
+        const tree = d3.tree();
 
         //  assigns the data to a hierarchy using parent-child relationships
         // let nodes = d3.hierarchy(treeData, d => d.children);
         let nodes = d3.hierarchy(treeData, d => d[2]);
 
+        // Compute the width of SVG based on the number of leaves
+        num_leaves = nodes.leaves().length;
+        width = num_leaves * 50;
+        tree.size([width, height]);
+
         // maps the node data to the tree layout
-        nodes = treemap(nodes);
+        nodes = tree(nodes);
 
 
         // adds the links between the nodes
@@ -66,7 +80,7 @@ function drawTree(treeData, svg) {
         const node = g.selectAll(".node")
             .data(nodes.descendants())
             .enter().append("g")
-            .attr("class", d => "node")
+            .attr("class", "node")
             .attr("transform", d => "translate(" + d.x + "," + d.y + ")");
 
         // adds the circle to the node
@@ -74,7 +88,7 @@ function drawTree(treeData, svg) {
             // .attr("r", d => d.data.value)
             // .style("stroke", d => d.data.type)
             // .style("fill", d => d.data.level);
-            .attr("r", 15)
+            .attr("r", 20)
             .style("stroke", 9)
             .style("fill", "lightblue")
 
@@ -82,7 +96,7 @@ function drawTree(treeData, svg) {
             .on('mouseover', function (d) {
                 d3.select(this).transition()
                                 .duration('50')
-                                .attr('opacity', '.8');
+                                .attr('opacity', '.9');
                 // arrayToBoard(side_board, d3.select(this).data()[0].data[0]);
                 arrayToBoard(side_board, d.data[0]);
             })
@@ -91,24 +105,19 @@ function drawTree(treeData, svg) {
                 d3.select(this).transition()
                                 .duration('50')
                                 .attr('opacity', '1');
-                setDefaultBoard(side_board)
+                setDefaultBoard(side_board);
             })
 
             .on('click', function (d) {
                 // @TODO - implement game logic
-                arrayToBoard(main_board, d.data[0]);
+                // arrayToBoard(main_board, d.data[0]);
             });
 
 
         // adds the text to the node
         node.append("text")
-            // .attr("dy", ".35em")
-            // .attr("x", d => d.children ? (d.data.value + 5) * -1 : d.data.value + 5)
-            // .attr("y", d => d.children && d.depth !== 0 ? -(d.data.value + 5) : d)
-            .attr("x", -4.5)
-            .attr("y", 2.5)
-            // .style("text-anchor", d => d.children ? "end" : "start")
-            // .style("text-anchor", "end")
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
             .text(d => d.data[1]);
     }
 }

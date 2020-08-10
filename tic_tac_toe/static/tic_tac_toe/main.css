@@ -4,11 +4,12 @@
     text-align: center;
     empty-cells: show;
     font-size: 5em;
-    padding-top: 100px;
+    padding: 20px;
 }
 
 .page_side {
     padding: 5%;
+    /* border: 1px solid brown; */
 }
 
 #left_side {
@@ -22,18 +23,18 @@
 .tree {
     overflow: hidden;
     width: 100%;
-    padding: 50px;
 }
 
 #tree_svg {
     float: right;
-    border: 1px solid brown;
-    overflow: hidden;
+    user-select: none;
+    /* border: 1px solid brown; */
 }
 
 td {
-  width: 50px;
-  height: 50px;
+  width: 33.33%;
+  position: relative;
+  /* height: 50px; */
 }
 
 .vert {
@@ -47,14 +48,24 @@ td {
 }
 
 /* Header/Blog Title */
-.header {
+.header, .footer {
   font-size: 20px;
   text-align: center;
   background: white;
+  padding: 10px;
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 50px;
+  padding: 30px;
   background: #ffffff;
+}
+
+
+select {
+  width : 8vw;
+  padding: 3px;
+  margin: 0;
+  box-sizing: border-box;
+  font-size: large;
 }

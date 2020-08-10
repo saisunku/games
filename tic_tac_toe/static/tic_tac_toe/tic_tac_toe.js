@@ -4,7 +4,6 @@ function setDefaultBoard(board) {
             board.rows[i].cells[j].textContent = nbsp;
         }
     }
-    cur_player = 'X';
 }
 
 function updatePlayer() {
@@ -13,6 +12,7 @@ function updatePlayer() {
     } else {
         cur_player = 'X'
     };
+    document.getElementById('game_status_display').innerHTML = "<h2> Current player " + cur_player + "</h2>"
 }
 
 function boardToArray(board) {
@@ -40,7 +40,6 @@ function arrayToBoard(board, array) {
 
 function isFull(board) {
     let boardArray = boardToArray(board);
-    console.log(boardArray.flat())
     return !boardArray.flat().includes(nbsp);
 }
 
@@ -80,8 +79,6 @@ function getWinner(board) {
         diag.push(boardArray[i][boardArray.length - i - 1]);
     }
     possibleWinners.push(diag)
-
-    console.log(possibleWinners)
 
     for (let possibleWinner of possibleWinners) {
         const winner = returnWinner(possibleWinner);

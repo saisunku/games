@@ -37,7 +37,6 @@ class tic_tac_toe_consumer(JsonWebsocketConsumer):
 
             if next_move:
                 T.make_move(cur_player, next_move[0], next_move[1])
-
                 
                 tree = T.get_minimax_tree(T.board, opponent, depth)
             else:
@@ -45,11 +44,11 @@ class tic_tac_toe_consumer(JsonWebsocketConsumer):
 
         else:
             # Human move, so just calculate tree
-            T = tic_tac_toe(3, ai_player = opponent, blank_char = chr(160))
+            T = tic_tac_toe(3, ai_player = cur_player, blank_char = chr(160))
             T.board = cur_board
+            tree = T.get_minimax_tree(T.board, cur_player, depth)
 
             next_move = None
-            tree = T.get_minimax_tree(T.board, cur_player, depth)
 
         # Array indexing in the Python module and in JS are opposite of each other
         if next_move:

@@ -1,215 +1,210 @@
-<html>
-    <head>
-        <title>Tic Tac Toe</title>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
+<!DOCTYPE html>
+<head>    
+    <meta charset="utf-8">
 
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'tic_tac_toe/main.css' %}" />
-        <script src="{% static 'tic_tac_toe/tic_tac_toe.js' %}"></script>
-    </head>
+    <title>Tic Tac Toe</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
 
-    <body>
-        <div class="header">
-            <h2><a href=index.html>Sai Sunku</a></h2>
-            <a href="https://github.com/saisunku/">GitHub</a> |
-            <a href="https://www.linkedin.com/in/saisunku/">LinkedIn</a> |
-            <a href=blog.html>Blog</a>
-            <br><br>
-            <h1>Tic Tac Toe Minimax Visualizer</h1>
-        </div>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'tic_tac_toe/main.css' %}" />
+    <script src="{% static 'tic_tac_toe/tic_tac_toe.js' %}"></script>
+</head>
 
+<body>
+    <header>
+        <h2><a href=index.html>Sai Sunku</a></h2>
+        <a href="https://github.com/saisunku/">GitHub</a> |
+        <a href="https://www.linkedin.com/in/saisunku/">LinkedIn</a> |
+        <a href=blog.html>Blog</a>
+        <br><br>
+        <h2>Tic Tac Toe Minimax Visualizer</h2>
+        <!-- <h3>Technologies used</h3> -->
+        <b>Backend:</b> Python, Django, WebSockets, pytest <br>
+        <b>Frontend:</b> HTML/CSS, JavaScript, d3.js
+    </header>
+
+    <main>
         <div class="page_side" id="left_side" style="float: left;">
+            <div class="player_selectors" style="float: none;">
+                Player X
+                <select name="Player X" id="player_X_dropdown">
+                    <option value="human">Human</option>
+                </select>
+            </div>
+            <div class="player_selectors" style="float:none;">
+                Player O
+                <select name="Player O" id="player_O_dropdown">
+                    <option value="minimax">Minimax</option>
+                    <option value="human">Human</option>
+                    <option value="random">Random</option>
+                </select>
+            </div>
+            <div id="game_status_display">
+                Start playing by clicking on one of the squares below
+            </div>
 
-        <div style="float: left;">
-        <h2>Player X</h2>
-        <select name="Player X" id="player_X_dropdown">
-            <option value="human">Human</option>
-        </select>
-        </div>
-        <div style="float: right;">
-        <h2>Player O</h2>
-        <select name="Player O" id="player_O_dropdown">
-            <option value="minimax">Minimax</option>
-            <option value="human">Human</option>
-            <option value="random">Random</option>
-        </select>
-        </div>
-        <div id="game_status_display" style="text-align: left; float: inherit;">
-            <br><br>
-            <h2>Start playing by clicking on one of the squares below</h2>
-        </div>
-
-        <table class="board" id="main_board">
-            <tr>
-                <td> </td>
-                <td class="vert"> </td>
-                <td> </td>
-            </tr>
-             <tr>
-                <td class="hori"> </td>
-                <td class="vert hori"> </td>
-                <td class="hori"> </td>
-            </tr>
-           <tr>
-                <td> </td>
-                <td class="vert"> </td>
-                <td> </td>
-            </tr>
-        </table>
-        <div id="reset_button_div" style="text-align: center;">
-        <br>
-        <button id="reset_button" style="font-size: x-large;">Reset</button>
-        </div>
-        <!-- <br><br>
+            <table class="board" id="main_board">
+                <tr>
+                    <td> </td>
+                    <td class="vert"> </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td class="hori"> </td>
+                    <td class="vert hori"> </td>
+                    <td class="hori"> </td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td class="vert"> </td>
+                    <td> </td>
+                </tr>
+            </table>
+            <div id="reset_button_div" style="text-align: center;">
+                <br>
+                <button id="reset_button" style="font-size: x-large;">Reset</button>
+            </div>
+            <!-- <br><br>
         <textarea id="from_server" cols="40" rows = "10"></textarea> -->
         </div>
 
-        <div class="page_side" id="right_side" style="float: right;">
+        <div class="page_side" id="right_side" style="float: right; text-align: center;">
+            <h2 style="display: inline;">Minimax tree</h2>
+            <h3 style="display: inline;"> (scroll to zoom, hover over node to see board position)</h3>
 
+            <div class="tree" id="tree_div" style="text-align: center;">
+                <svg id="tree_svg" width="100%" height="90%"></svg>
+            </div>
 
-        <div class="tree" style="text-align: center;">
-            <h2 style="display: inline;">Minimax tree</h2><h3 style="display: inline;">   (scroll to zoom)</h3>
-            <svg id="tree_svg" width="100%" height="42%"></svg>
+            <div style="float: left; width: 60%;">
+                <div id="tree_buttons">
+                    <h2 style="display: inline; padding: 10px;">Tree Depth</h2>
+                    <select name="Tree Depth" id="tree_depth_dropdown">
+                        <option value=1>1</option>
+                        <option value=2 selected="selected">2</option>
+                        <option value=3>3</option>
+                        <option value=4>4</option>
+                    </select>
+                    <button id="reset_tree_button" style="font-size: x-large;">Update Tree</button>
+                </div>
+
+                <div id="Tree description" style="text-align: left;">
+                    <br><br>
+                    The Minimax algorithm calculates all possible board positions into the future and picks the optimal
+                    move. This site provides a visualization of the algorithm. <br><br>
+                    The root of the tree is the current position and each node is a possible future board position. Each
+                    node is assigned a score assuming optimal play from both players.<br><br>
+                    When playing against the Minimax AI, a score of 0 means that the game is bound to end in a draw. A
+                    score of +10 is a guaranteed win for the AI and a score of -10 is a guaranteed loss.
+
+                </div>
+
+            </div>
+
+            <div style="float: right; width: 20%;">
+                <table class="board" id="side_board">
+                    <tr>
+                        <td> </td>
+                        <td class="vert"> </td>
+                        <td> </td>
+                    </tr>
+                    <tr>
+                        <td class="hori"> </td>
+                        <td class="vert hori"> </td>
+                        <td class="hori"> </td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+                        <td class="vert"> </td>
+                        <td> </td>
+                    </tr>
+                </table>
+            </div>
         </div>
+    </main>
 
-        <div style="float: left;">
-            <h2 style="display: inline; padding: 10px;">Tree Depth</h2>
-            <select name="Tree Depth" id="tree_depth_dropdown">
-                <option value=1>1</option>
-                <option value=2 selected="selected">2</option>
-                <option value=3>3</option>
-                <option value=4>4</option>
-            </select>
-        </div>
+    <script>
+        let cur_player = 'X';
 
-        <div style="float: right; width: 20%;">
-        <table class="board" id="side_board">
-            <tr>
-                <td> </td>
-                <td class="vert"> </td>
-                <td> </td>
-            </tr>
-             <tr>
-                <td class="hori"> </td>
-                <td class="vert hori"> </td>
-                <td class="hori"> </td>
-            </tr>
-           <tr>
-                <td> </td>
-                <td class="vert"> </td>
-                <td> </td>
-            </tr>
-        </table>
-        </div>
-        </div>
+        const nbsp = String.fromCharCode(160); // charCode 160 is a non-breaking space
 
-        
-        
-        <div class="footer">
-            <br><br>
-            <h2>Technologies used</h2>
-            <b>Backend:</b> Python, Django, WebSockets, pytest  <br>
-            <b>Frontend:</b> HTML/CSS, JavaScript, d3.js
-        </div>
+        const main_board = document.getElementById('main_board');
+        const side_board = document.getElementById('side_board');
+        setDefaultBoard(main_board);
+        setDefaultBoard(side_board);
+        const svg = d3.select("#tree_svg");
+        // drawTree(null, svg);
 
-        <script>
-            let cur_player = 'X';
+        // Connect to server via WebSocket
+        const gameSocket = new WebSocket(
+            'ws://' +
+            window.location.host +
+            '/ws/tic_tac_toe/'
+        )
 
-            const nbsp = String.fromCharCode(160); // charCode 160 is a non-breaking space
+        gameSocket.onmessage = function (e) {
+            // Executes when a message is received from the server
+            const game_data = JSON.parse(e.data);
+            next_move = game_data.next_move;
+            treeData = game_data.tree;
 
-            const main_board = document.getElementById('main_board');
-            const side_board = document.getElementById('side_board');
-            setDefaultBoard(main_board);
-            setDefaultBoard(side_board);
-            const svg = d3.select("#tree_svg");
-            // drawTree(null, svg);
+            // document.getElementById('from_server').textContent += next_move + '\n';
+            drawTree(treeData, svg);
 
-            // Connect to server via WebSocket
-            const gameSocket = new WebSocket(
-                'ws://'
-                + window.location.host
-                + '/ws/tic_tac_toe/'
-            )
+            const ai = document.getElementById('player_O_dropdown').value;
+            if (next_move) {
+                main_board.rows[next_move[0]].cells[next_move[1]].innerHTML = "<div class='content'>" + cur_player +
+                    "<br><br></div>";
 
-            function getAIMove(ai, cur_board) {
-                gameSocket.send(JSON.stringify({
-                    'cur_player': cur_player,
-                    'ai': ai,
-                    'cur_board': boardToArray(main_board),
-                    'tree_depth': document.getElementById('tree_depth_dropdown').value,
-                }))
-            }
-
-            function checkDrawOrWinner(board) {
-                const winner = getWinner(board);
-                const draw = isFull(board);
-
-                if (winner) {
-                    // document.getElementById('from_server').textContent += cur_player + ' won!\n';
-                    document.getElementById('game_status_display').innerHTML = "<h2>" + winner + " won! Press the reset button to play again.</h2>"
-                    return true;
-                }
-                else if (draw) {
-                    // document.getElementById('from_server').textContent += 'Draw!\n';
-                    document.getElementById('game_status_display').innerHTML = "<h2> Draw! Press the reset button to play again.</h2>"
-                    return true;
-                }
-                return false;
-            }
-
-            gameSocket.onmessage = function(e) {
-                // Executes when a message is received from the server
-                const game_data = JSON.parse(e.data);
-                next_move = game_data.next_move;
-                treeData = game_data.tree;
-
-                // document.getElementById('from_server').textContent += next_move + '\n';
-                drawTree(treeData, svg);
-
-                const ai = document.getElementById('player_O_dropdown').value;
-                if (ai == 'random' || ai == 'minimax') {
-                    main_board.rows[next_move[0]].cells[next_move[1]].textContent = cur_player;
-                
-                    if (!checkDrawOrWinner(main_board)) {
-                        updatePlayer();
-                    }
+                if (!checkDrawOrWinner(main_board)) {
+                    updatePlayer();
                 }
             }
+        }
 
-            gameSocket.onclose = function(e) {
-                // Executes when the connection closes
-                console.error('Chat socket closed unexpectedly');
-            };
+        gameSocket.onclose = function (e) {
+            // Executes when the connection closes
+            document.getElementById('game_status_display').textContent = "Server disconnected. Refresh page to try again."
+            console.error('Chat socket closed unexpectedly');
+        };
 
-            // Executes on cell click
-            for (let i = 0; i < main_board.rows.length; i++){
-                for (let j = 0; j < main_board.rows[i].cells.length; j++){
-                    main_board.rows[i].cells[j].onclick = function () {
-                        if (main_board.rows[i].cells[j].textContent == nbsp) {
-                            main_board.rows[i].cells[j].textContent = cur_player;
+        // Executes on cell click
+        for (let i = 0; i < main_board.rows.length; i++) {
+            for (let j = 0; j < main_board.rows[i].cells.length; j++) {
+                main_board.rows[i].cells[j].onclick = function () {
+                    if (main_board.rows[i].cells[j].textContent == nbsp) {
+                        main_board.rows[i].cells[j].innerHTML = "<div class='content'>" + cur_player + "</div>";
 
-                            if (!checkDrawOrWinner(main_board)) {
-                                updatePlayer();
+                        if (!checkDrawOrWinner(main_board)) {
+                            updatePlayer();
 
-                                const ai = document.getElementById('player_O_dropdown').value;
-                                getAIMove(ai, main_board);
-                            }
+                            const ai = document.getElementById('player_O_dropdown').value;
+                            getAIMove(ai, main_board);
                         }
                     }
                 }
             }
+        }
 
-            // Reset button
-            document.getElementById('reset_button').onclick = function () {
-                setDefaultBoard(main_board);
-                setDefaultBoard(side_board);
-                drawTree(null, svg);
-                document.getElementById('game_status_display').innerHTML = "<h2>Start playing by clicking on one of the squares below</h2>";
-                cur_player = 'X';
+        // Reset button
+        document.getElementById('reset_button').onclick = function () {
+            setDefaultBoard(main_board);
+            setDefaultBoard(side_board);
+            drawTree(null, svg);
+            document.getElementById('game_status_display').textContent =
+                "Start playing by clicking on one of the squares below"
+            cur_player = 'X';
+        }
+
+        // Reset tree button
+        document.getElementById('reset_tree_button').onclick = function () {
+            if (typeof treeData != "undefined") {
+                getAIMove("human", main_board);
             }
+        }
+    </script>
 
-       </script>
+    <script src="{% static 'tic_tac_toe/drawTree.js' %}"></script>
+</body>
 
-        <script src="{% static 'tic_tac_toe/drawTree.js' %}"></script>
-    </body>
 </html>

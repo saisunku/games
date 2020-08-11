@@ -1,7 +1,8 @@
 function setDefaultBoard(board) {
+    // Reset the board
     for (let i = 0; i < board.rows.length; i++) {
         for (let j = 0; j < board.rows[i].cells.length; j++) {
-            board.rows[i].cells[j].textContent = nbsp;
+            board.rows[i].cells[j].innerHTML = "<div class='content'>" + nbsp + "</div>";
         }
     }
 }
@@ -12,7 +13,7 @@ function updatePlayer() {
     } else {
         cur_player = 'X'
     };
-    document.getElementById('game_status_display').innerHTML = "<h2> Current player " + cur_player + "</h2>"
+    document.getElementById('game_status_display').textContent = "Current player " + cur_player;
 }
 
 function boardToArray(board) {
@@ -31,9 +32,9 @@ function boardToArray(board) {
 function arrayToBoard(board, array) {
     // Writes a JavaScript array which contains a tic-tac-toe board position to a HTML board for display
 
-    for (let i = 0; i < board.rows.length; i ++) {
+    for (let i = 0; i < board.rows.length; i++) {
         for (let j = 0; j < board.rows[i].cells.length; j++) {
-            board.rows[i].cells[j].textContent = array[i][j];
+            board.rows[i].cells[j].innerHTML = "<div class='content'>" + array[i][j] + "</div>";;
         }
     }
 }
@@ -88,4 +89,32 @@ function getWinner(board) {
     }
 
     return null;
+}
+
+function checkDrawOrWinner(board) {
+    const winner = getWinner(board);
+    const draw = isFull(board);
+
+    if (winner) {
+        // document.getElementById('from_server').textContent += cur_player + ' won!\n';
+        document.getElementById('game_status_display').textContent = winner + " won! Press the reset button to play again."
+        drawTree(null, svg);
+        return true;
+    } else if (draw) {
+        // document.getElementById('from_server').textContent += 'Draw!\n';
+        document.getElementById('game_status_display').textContent = "Draw! Press the reset button to play again."
+        drawTree(null, svg);
+        return true;
+    }
+    return false;
+}
+
+function getAIMove(ai, cur_board) {
+    // Get the next move and the game tree from the server
+    gameSocket.send(JSON.stringify({
+        'cur_player': cur_player,
+        'ai': ai,
+        'cur_board': boardToArray(main_board),
+        'tree_depth': document.getElementById('tree_depth_dropdown').value,
+    }))
 }

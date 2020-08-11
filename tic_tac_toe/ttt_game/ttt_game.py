@@ -1,5 +1,6 @@
 #
 # Program that is unbeatable at tic-tac-toe using the minimax algorithm
+# Inspired by and based on Robert Heaton's blog https://robertheaton.com/2018/10/09/programming-projects-for-advanced-beginners-3-b/
 #
 
 import random, copy, pdb

@@ -1,12 +1,17 @@
-.board {
-    width: 100%;
-    background-color: white;
-    text-align: center;
-    empty-cells: show;
-    font-size: 5em;
-    padding: 20px;
+/* Text */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 30px;
+  background: #ffffff;
 }
 
+header {
+  font-size: x-large;
+  text-align: center;
+  /* padding: 10px; */
+}
+
+/* Page contents */
 .page_side {
     padding: 5%;
     /* border: 1px solid brown; */
@@ -20,21 +25,63 @@
     width: 60%;
 }
 
-.tree {
-    overflow: hidden;
-    width: 100%;
+select {
+  width : 8vw;
+  padding: 3px;
+  margin: 0;
+  box-sizing: border-box;
+  font-size: large;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-#tree_svg {
-    float: right;
-    user-select: none;
-    /* border: 1px solid brown; */
+.player_selectors {
+  font-size: x-large;
+  font-weight: bold;
+  text-align: center;
+}
+
+#game_status_display {
+  text-align: center;
+  float: inherit;
+  height: 10%;
+  font-size: x-large;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+/* Game board */
+/* Based on https://codepen.io/xunnn/pen/yEmMbm */
+.board {
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    empty-cells: show;
+    font-size: 4vw;
+    padding: 20px;
+}
+
+#side_board {
+  font-size: 2vw !important;
 }
 
 td {
   width: 33.33%;
   position: relative;
-  /* height: 50px; */
+}
+
+td::after{
+  content: '';
+  display: block;
+  margin-top: 100%;
+}
+
+td .content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .vert {
@@ -47,25 +94,14 @@ td {
   border-bottom: 2px solid black;
 }
 
-/* Header/Blog Title */
-.header, .footer {
-  font-size: 20px;
-  text-align: center;
-  background: white;
-  padding: 10px;
+/* Minimax Tree */
+.tree {
+    overflow: hidden;
+    width: 100%;
+    border: 0.05px solid lightgray;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 30px;
-  background: #ffffff;
-}
-
-
-select {
-  width : 8vw;
-  padding: 3px;
-  margin: 0;
-  box-sizing: border-box;
-  font-size: large;
+#tree_svg {
+    float: right;
+    user-select: none;
 }

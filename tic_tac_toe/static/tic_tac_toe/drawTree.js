@@ -1,59 +1,55 @@
-// Update some attributes of the SVG and add zoom
-const margin = {
-        top: 50,
-        right: 90,
-        bottom: 30,
-        left: 50
-    };
+/**
+ * Function that draws the tree
+ * Based on Robert Gravelle's post https://www.developer.com/lang/jscript/creating-a-tree-diagram-with-d3.js.html
+ */
 
-height = 400 - margin.left - margin.right;
-width = 2000 - margin.top - margin.bottom;
-
-svg.attr("fill", "red")
-    // .attr("stroke", "red")
-    .attr("viewBox", [0, 0, width, height])
-    .call(d3.zoom()
-        // .extent([[0, 0], [width, height]])
-        .scaleExtent([0.1, 10])
-        .on("zoom", function () {
-        g.attr("transform", d3.event.transform)
-     }));
-
-
-//Function that draws the tree
 function drawTree(treeData, svg) {
-    
-    // Get the side board element
-    const side_board = document.getElementById("side_board");
-
-    // Remove the old group element in the SVG and add a new one
+    // Remove the old group element in the SVG to make it blank
     svg.selectAll("*").remove();
-    g = svg.append("g")
-        // .attr("transform",
-        //     "translate(" + 0 + "," + 0 + ")");
-        // .attr("style",
-        //     "translate(0%, 50%)");
-        // .attr("transform","translate(30,100)scale(3,3)");
 
     // If treeData is not null, draw the tree
     if (treeData) {
+         // Get the side board element and set the height of the SVG
+         const side_board = document.getElementById("side_board");
+         const height = document.getElementById('tree_depth_dropdown').value * 100;
 
-
-        // declares a tree layout and assigns the size
-        const tree = d3.tree();
-
-        //  assigns the data to a hierarchy using parent-child relationships
-        // let nodes = d3.hierarchy(treeData, d => d.children);
+        // Assign the data to a hierarchy using parent-child relationships
         let nodes = d3.hierarchy(treeData, d => d[2]);
 
         // Compute the width of SVG based on the number of leaves
         num_leaves = nodes.leaves().length;
         width = num_leaves * 50;
-        tree.size([width, height]);
 
-        // maps the node data to the tree layout
+        // Generate the tree
+        const tree = d3.tree();
+        tree.size([width, height]);
         nodes = tree(nodes);
 
+svg.style("height", height)
+                .style("width", width);
+
+
+
+        // Set the color and append the main group element
+        g = svg.attr("fill", "red")
+               .append("g")
+            // .attr("stroke", "red")
+            // .attr("viewBox", [0, 0, width, height])
+
+        // Define the zoom function and call it once to center the main group element 
+        // https://stackoverflow.com/questions/57119405/how-can-i-offset-the-initial-starting-position-of-a-d3-zoom
+        div_width = document.getElementById('tree_div').offsetWidth; // width of the enclosing div
+
+        zoom = d3.zoom()
+            .scaleExtent([0.35, 5])
+            .on("zoom", function () {
+            g.attr("transform", d3.event.transform)
+        });
+
+        svg.call(zoom.transform, d3.zoomIdentity.scale(1).translate(((div_width - width) / 2), 30));
+
+        // Define the zoom call function for the SVG
+        svg.call(zoom);
 
         // adds the links between the nodes
         const link = g.selectAll(".link")
@@ -97,7 +93,6 @@ function drawTree(treeData, svg) {
                 d3.select(this).transition()
                                 .duration('50')
                                 .attr('opacity', '.9');
-                // arrayToBoard(side_board, d3.select(this).data()[0].data[0]);
                 arrayToBoard(side_board, d.data[0]);
             })
             
@@ -114,7 +109,7 @@ function drawTree(treeData, svg) {
             });
 
 
-        // adds the text to the node
+        // add the minimax score to the node
         node.append("text")
             .attr("dy", ".35em")
             .attr("text-anchor", "middle")

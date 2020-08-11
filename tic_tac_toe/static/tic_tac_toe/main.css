@@ -97,8 +97,9 @@ td .content {
 /* Minimax Tree */
 .tree {
     overflow: hidden;
-    width: 100%;
+    width: 60vw;
     border: 0.05px solid lightgray;
+    height: 35vh;
 }
 
 #tree_svg {

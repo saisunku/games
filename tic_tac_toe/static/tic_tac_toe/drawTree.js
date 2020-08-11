@@ -25,11 +25,6 @@ function drawTree(treeData, svg) {
         tree.size([width, height]);
         nodes = tree(nodes);
 
-svg.style("height", height)
-                .style("width", width);
-
-
-
         // Set the color and append the main group element
         g = svg.attr("fill", "red")
                .append("g")

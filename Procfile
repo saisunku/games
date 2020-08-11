@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p 8001 games.asgi:application
+web: daphne games.asgi:application --port $PORT --bind 0.0.0.0 -v2

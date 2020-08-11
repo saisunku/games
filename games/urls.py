@@ -19,5 +19,6 @@ from django.conf.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('tic_tac_toe/', include('tic_tac_toe.urls'))
+    path('tic_tac_toe/', include('tic_tac_toe.urls')),
+    path('', include('tic_tac_toe.urls'))
 ]

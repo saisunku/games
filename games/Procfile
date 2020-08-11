@@ -1,1 +1,1 @@
-web daphne games.asgi:application
+web: daphne games.asgi:application

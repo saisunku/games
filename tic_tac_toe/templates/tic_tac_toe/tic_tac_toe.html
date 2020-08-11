@@ -136,8 +136,9 @@
         // drawTree(null, svg);
 
         // Connect to server via WebSocket
+        const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
         const gameSocket = new WebSocket(
-            'ws://' +
+            ws_scheme + '://' +
             window.location.host +
             '/ws/tic_tac_toe/'
         )

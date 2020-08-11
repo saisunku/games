@@ -8,6 +8,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'tic_tac_toe/main.css' %}" />
     <script src="{% static 'tic_tac_toe/tic_tac_toe.js' %}"></script>
+    <script src="{% static 'tic_tac_toe/reconnecting-websocket.js' %}"></script>
 </head>
 
 <body>
@@ -139,7 +140,7 @@
 
         // Connect to server via WebSocket
         const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        const gameSocket = new WebSocket(
+        const gameSocket = new ReconnectingWebSocket(
             ws_scheme + '://' +
             window.location.host +
             '/ws/tic_tac_toe/'

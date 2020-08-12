@@ -16,6 +16,10 @@ function updatePlayer() {
     document.getElementById('game_status_display').textContent = "Current player " + cur_player;
 }
 
+function getPlayerColor(player) {
+    return player === 'X' ? "lightseagreen" : "lightsteelblue";
+}
+
 function boardToArray(board) {
     // Converts the board which is a HTML table to a JavaScript array
     let boardArray = [];

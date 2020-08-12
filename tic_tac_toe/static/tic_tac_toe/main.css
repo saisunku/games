@@ -43,8 +43,7 @@ select {
 
 #game_status_display {
   text-align: center;
-  float: inherit;
-  height: 10%;
+  height: 9vw;
   font-size: x-large;
   font-weight: bold;
   vertical-align: middle;

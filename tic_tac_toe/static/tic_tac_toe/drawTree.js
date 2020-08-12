@@ -75,13 +75,15 @@ function drawTree(treeData, svg) {
             .attr("transform", d => "translate(" + d.x + "," + d.y + ")");
 
         // adds the circle to the node
+        const cur_color = getPlayerColor(cur_player);
+        const other_color = getPlayerColor(cur_player === 'X' ? 'O' : 'X')
         node.append("circle")
             // .attr("r", d => d.data.value)
             // .style("stroke", d => d.data.type)
             // .style("fill", d => d.data.level);
             .attr("r", 20)
             .style("stroke", 9)
-            .style("fill", "lightblue")
+            .style("fill", d => d.depth % 2 == 0 ? cur_color : other_color)
 
             // Hover effects
             .on('mouseover', function (d) {

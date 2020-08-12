@@ -28,13 +28,13 @@
 
     <main>
         <div class="page_side" id="left_side" style="float: left;">
-            <div class="player_selectors" style="float: none;">
+            <div class="player_selectors" style="float: none; color: lightseagreen;">
                 Player X
                 <select name="Player X" id="player_X_dropdown">
                     <option value="human">Human</option>
                 </select>
             </div>
-            <div class="player_selectors" style="float:none;">
+            <div class="player_selectors" style="float:none; color: lightsteelblue;">
                 Player O
                 <select name="Player O" id="player_O_dropdown">
                     <option value="minimax">Minimax</option>
@@ -42,10 +42,7 @@
                     <option value="random">Random</option>
                 </select>
             </div>
-            <div id="game_status_display">
-                Start playing by clicking on one of the squares below
-            </div>
-
+            
             <table class="board" id="main_board">
                 <tr>
                     <td> </td>
@@ -63,8 +60,13 @@
                     <td> </td>
                 </tr>
             </table>
+
+            <div id="game_status_display">
+                Start playing by clicking on one of the squares above
+            </div>
+
+                <hr>
             <div id="reset_button_div" style="text-align: center;">
-                <br>
                 <button id="reset_button" style="font-size: x-large;">Reset</button>
             </div>
             <!-- <br><br>
@@ -153,7 +155,6 @@
             treeData = game_data.tree;
 
             // document.getElementById('from_server').textContent += next_move + '\n';
-            drawTree(treeData, svg);
 
             const ai = document.getElementById('player_O_dropdown').value;
             if (next_move) {
@@ -164,6 +165,8 @@
                     updatePlayer();
                 }
             }
+
+            drawTree(treeData, svg);
         }
 
         gameSocket.onclose = function (e) {

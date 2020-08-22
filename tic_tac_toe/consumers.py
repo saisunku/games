@@ -34,6 +34,8 @@ class tic_tac_toe_consumer(JsonWebsocketConsumer):
                 next_move = T.minimax(cur_player)
             elif ai == 'random':
                 next_move = T.random_ai(cur_player)
+            else:
+                next_move = None
 
             if next_move:
                 T.make_move(cur_player, next_move[0], next_move[1])

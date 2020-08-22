@@ -74,10 +74,21 @@ function drawTree(treeData, svg) {
             .attr("class", "node")
             .attr("transform", d => "translate(" + d.x + "," + d.y + ")");
 
-        // adds the circle to the node
         const cur_color = getPlayerColor(cur_player);
         const other_color = getPlayerColor(cur_player === 'X' ? 'O' : 'X')
-        node.append("circle")
+
+        // Create a group that holds the circle and the score and add mouseover effects
+        g_node = node.append("g")
+            // Hover effects
+            .on('mouseover', onMouseover)
+            .on('mouseout', onMouseout)
+            .on('click', function (d) {
+                // @TODO - implement game logic
+                // arrayToBoard(main_board, d.data[0]);
+            });
+
+        // add the circle to the node group
+        g_node.append("circle")
             // .attr("r", d => d.data.value)
             // .style("stroke", d => d.data.type)
             // .style("fill", d => d.data.level);
@@ -85,31 +96,29 @@ function drawTree(treeData, svg) {
             .style("stroke", 9)
             .style("fill", d => d.depth % 2 == 0 ? cur_color : other_color)
 
-            // Hover effects
-            .on('mouseover', function (d) {
-                d3.select(this).transition()
-                                .duration('50')
-                                .attr('opacity', '.9');
-                arrayToBoard(side_board, d.data[0]);
-            })
-            
-            .on('mouseout', function () {
-                d3.select(this).transition()
-                                .duration('50')
-                                .attr('opacity', '1');
-                setDefaultBoard(side_board);
-            })
-
-            .on('click', function (d) {
-                // @TODO - implement game logic
-                // arrayToBoard(main_board, d.data[0]);
-            });
-
-
-        // add the minimax score to the node
-        node.append("text")
+        // add the minimax score to the node group
+        g_node.append("text")
             .attr("dy", ".35em")
             .attr("text-anchor", "middle")
-            .text(d => d.data[1]);
+            .text(d => d.data[1])
     }
+}
+
+/*
+* Functions to change the opacity of the circle and update the side board on mouse events
+*/
+var onMouseover = function(d) {
+    d3.select(this).select("circle")
+                    .transition()
+                    .duration('50')
+                    .attr('opacity', '.7');
+    arrayToBoard(side_board, d.data[0]);
+}
+
+var onMouseout = function() {
+    d3.select(this).select("circle")
+                    .transition()
+                    .duration('50')
+                    .attr('opacity', '1');
+    setDefaultBoard(side_board);
 }

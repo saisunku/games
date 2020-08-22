@@ -8,11 +8,7 @@ function setDefaultBoard(board) {
 }
 
 function updatePlayer() {
-    if (cur_player === 'X') {
-        cur_player = 'O'
-    } else {
-        cur_player = 'X'
-    };
+    cur_player === 'X' ? cur_player = 'O' : cur_player = 'X';
     document.getElementById('game_status_display').textContent = "Current player " + cur_player;
 }
 
@@ -35,10 +31,9 @@ function boardToArray(board) {
 
 function arrayToBoard(board, array) {
     // Writes a JavaScript array which contains a tic-tac-toe board position to a HTML board for display
-
     for (let i = 0; i < board.rows.length; i++) {
         for (let j = 0; j < board.rows[i].cells.length; j++) {
-            board.rows[i].cells[j].innerHTML = "<div class='content'>" + array[i][j] + "</div>";;
+            board.rows[i].cells[j].innerHTML = "<div class='content'>" + array[i][j] + "</div>";
         }
     }
 }
@@ -86,8 +81,7 @@ function getWinner(board) {
     possibleWinners.push(diag)
 
     for (let possibleWinner of possibleWinners) {
-        const winner = returnWinner(possibleWinner);
-        if (winner) {
+        if (winner = returnWinner(possibleWinner)) {
             return winner;
         }
     }

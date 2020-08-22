@@ -8,6 +8,8 @@ I used the Django framework for the back end. I used WebSockets, as implemented 
 
 Check it out at [https://minimax-visualizer.herokuapp.com/](https://minimax-visualizer.herokuapp.com/)
 
+The logic for the tic tac toe is contained in `/tic_tac_toe/ttt_game`. The JavaScript files for drawing the tree and game control are in `/tic_tac_toe/static/tic_tac_toe`.
+
 ## Installation
 
 - Clone this repo to your local machine using `https://github.com/saisunku/games.git`

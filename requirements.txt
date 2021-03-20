@@ -30,7 +30,7 @@ jaraco.text==3.2.0
 jasmine==3.5.0
 jasmine-core==3.6.0
 jedi
-Jinja2==2.11.2
+Jinja2==2.11.3
 lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
 mccabe==0.6.1

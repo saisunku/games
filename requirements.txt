@@ -49,7 +49,7 @@ PyHamcrest==2.0.2
 pylint
 pyOpenSSL==19.1.0
 pytz==2020.1
-PyYAML==5.3.1
+PyYAML==5.4
 selenium==3.141.0
 service-identity==18.1.0
 six==1.15.0

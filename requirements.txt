@@ -1,7 +1,7 @@
 ﻿asgiref
 astroid
 attrs==19.3.0
-autobahn==20.7.1
+autobahn==20.12.3
 Automat==20.2.0
 backcall==0.2.0
 certifi==2020.6.20
